@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  database:
+    build:
+      context: ..
+      dockerfile: ./docker/database/Dockerfile
+    environment:
+      POSTGRES_USER: puffintalk_db
+      POSTGRES_PASSWORD: puffintalk_db_password
+      POSTGRES_DB: puffintalk
+    volumes:
+      - ../data/postgresql_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+
+  app:
+    build:
+      context: ..
+      dockerfile: ./docker/app/Dockerfile
+    environment:
+      DB_HOST: database
+      DB_PORT: 5432
+      POSTGRES_USER: puffintalk_db
+      POSTGRES_PASSWORD: puffintalk_db_password
+      POSTGRES_DB: puffintalk
+      # For development only
+      ENABLE_TEST_API: 1
+      WILDCARD_PASSCODE: 654321
+    volumes:
+      - ../src:/usr/src/app/src
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+    networks:
+      - backend
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: suyuan@cloudmosa.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - database
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

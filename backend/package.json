@@ -1,0 +1,26 @@
+{
+  "name": "puffintalk-backend",
+  "version": "1.0.0",
+  "description": "Backend for PuffinTalk application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "docker": "docker-compose -f ../docker/docker-compose.yml up --build",
+    "docker-dev": "docker-compose -f ../docker/docker-compose.yml up --build --force-recreate"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "pg": "^8.7.1",
+    "body-parser": "^1.19.0",
+    "jsonwebtoken": "^8.5.1",
+    "bcrypt": "^5.0.1",
+    "multer": "^1.4.4",
+    "ws": "^8.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  },
+  "author": "suyuan.chang@gmail.com",
+  "license": "MIT"
+}
