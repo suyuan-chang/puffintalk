@@ -11,8 +11,7 @@ RUN mkdir -p /usr/src/app/src
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json
-COPY ./package.json ./
-COPY ./package-lock.json ./
+COPY ./package*.json ./
 
 # Install app dependencies
 RUN npm install
