@@ -26,9 +26,7 @@ PuffinTalk supports sending:
 - **User Authentication**: Secure login and registration system.
 - **Responsive Design**: Designed for QVGA and QQVGA feature phone.
 - **Navigation**: Support both keypad and touch screen navigation.
-- **User Profiles**: Customizable user profiles with avatars.
 - **Message History**: Persistent message history for each conversation.
-- **Typing Indicators**: See when someone is typing a message.
 - **Read Receipts**: Know when your messages have been read.
 - **Notifications**: Real-time notifications for new messages.
 

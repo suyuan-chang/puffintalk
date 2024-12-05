@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "4000:3000"
+    volumes:
+      - ../src:/usr/src/app/src
+      - ../public:/usr/src/app/public
+    environment:
+      - NODE_ENV=development
