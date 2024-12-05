@@ -139,11 +139,16 @@ router.post('/send', authenticateJWT, async (req, res) => {
     );
 
     // Notify the receiver of the new message.
-    notifyClients({
-      event: "messages_updated",
-      sender: senderPhoneNumber,
-      timestamp: new Date().toISOString()
-    }, receiverId);
+    if (notifyClients({
+          event: "messages_updated",
+          sender: senderPhoneNumber,
+          timestamp: new Date().toISOString()
+        }, receiverId)) {
+      await pool.query(
+        `UPDATE messages SET status = 'delivered' WHERE id = $1`,
+        [messageId]
+      );
+    }
 
     // return the newly created message
     const newMessage = await pool.query(
