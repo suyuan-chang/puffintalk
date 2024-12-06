@@ -6,15 +6,17 @@ const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 const { notifyClients } = require('../websocket');
 
-router.get('/', authenticateJWT, async (req, res) => {
-  const { phone_number } = req.body;
+router.get('/:phoneNumber', authenticateJWT, async (req, res) => {
+  const phoneNumber = req.params.phoneNumber;
   const userId = req.user.user_id;
+  const { count } = req.query;
+  const limit = count ? parseInt(count, 10) : 100;
 
   try {
-    if (phone_number) {
+    if (phoneNumber) {
       const contactResult = await pool.query(
         'SELECT id FROM users WHERE phone_number = $1',
-        [phone_number]
+        [phoneNumber]
       );
 
       if (contactResult.rows.length === 0) {
@@ -24,38 +26,20 @@ router.get('/', authenticateJWT, async (req, res) => {
 
       pool.query(
         `SELECT m.id, sender.phone_number AS sender, receiver.phone_number AS receiver,
-            m.message, m.message_type, m.status, m.created_at,
-            mc.media_type, mc.id AS media_content_id
+                m.message, m.message_type, m.status, m.created_at,
+                mc.media_type, mc.id AS media_content_id
          FROM messages m
          JOIN users sender ON m.sender_id = sender.id
          JOIN users receiver ON m.receiver_id = receiver.id
          LEFT JOIN media_content mc ON mc.message_id = m.id
          WHERE (m.sender_id = $1 AND m.receiver_id = $2) OR
                (m.sender_id = $2 AND m.receiver_id = $1)
-         ORDER BY m.created_at DESC`,
-        [userId, contactId],
+         ORDER BY m.created_at DESC
+         LIMIT $3`,
+        [userId, contactId, limit],
         (error, results) => {
           if (error) {
         return res.status(500).json({ error: 'Database query error' });
-          }
-          res.status(200).json({ messages: results.rows });
-        }
-      );
-    } else {
-      pool.query(
-        `SELECT m.id, sender.phone_number AS sender, receiver.phone_number AS receiver,
-                m.message, m.message_type, m.status, m.created_at,
-                mc.media_type, mc.id AS media_content_id
-        FROM messages m
-        JOIN users sender ON m.sender_id = sender.id
-        JOIN users receiver ON m.receiver_id = receiver.id
-        LEFT JOIN media_content mc ON mc.message_id = m.id
-        WHERE m.sender_id = $1 OR m.receiver_id = $1
-        ORDER BY m.created_at DESC`,
-        [userId],
-        (error, results) => {
-          if (error) {
-            return res.status(500).json({ error: 'Database query error' });
           }
           res.status(200).json({ messages: results.rows });
         }

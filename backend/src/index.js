@@ -1,9 +1,17 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const { initializeWebSocketServer } = require('./websocket');
 
 const app = express();
 const port = process.env.PORT || 3000;
+const frontend_domain = process.env.FRONTEND_DOMAIN || 'http://localhost:4000';
+
+app.use(cors({
+  origin: frontend_domain,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
 
 app.use(bodyParser.json());
 

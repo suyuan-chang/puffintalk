@@ -1,0 +1,151 @@
+body {
+  background-color: #1A73E8;
+  font-family: 'Roboto', sans-serif;
+  margin: 0px;
+}
+
+.container {
+  text-align: center;
+  padding: 13px 18px;
+}
+
+input {
+  margin: 10px 0;
+  padding: 10px;
+  width: 80%;
+  max-width: 300px;
+  border-radius: 10px;
+  border-width: 0;
+  text-align: center;
+}
+
+button {
+  margin: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 16px;
+  height: 32px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  line-height: 9px;
+  text-align: center;
+  border: 0px;
+  background-color: #1A73E8;
+  color: white;
+}
+
+button.signin {
+  background-color: #F2B911;
+  min-width: 100px;
+}
+
+button.signup {
+  background-color: #F28205;
+  min-width: 100px;
+}
+
+button.menu {
+  background: url('../assets/menu.png') no-repeat center center;
+  background-size: 32px 32px;
+  width: 40px;
+  height: 40px;
+  margin: 0px;
+  padding: 0px;
+  border: none;
+  color: transparent;
+  text-indent: -9999px;
+  outline: none;
+}
+
+button.back {
+  background: url('../assets/back.png') no-repeat center center;
+  background-size: 32px 32px;
+  width: 40px;
+  min-width: 40px;;
+  height: 40px;
+  margin: 0px;
+  padding: 0px;
+  border: none;
+  color: transparent;
+  text-indent: -9999px;
+  outline: none;
+}
+
+h1 {
+  color: white;
+  font-family: 'Roboto Black', sans-serif;
+  font-size: 25px;
+  line-height: 30px;
+  margin: 10px;
+}
+
+.logo {
+  width: 30%;
+}
+
+.full_container {
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  background-color: white;
+}
+
+.header {
+  height: 40px;
+  background-color: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0px;
+  margin: 0px;
+  font-family: 'Roboto Black', sans-serif;
+  font-size: 20px;
+  line-height: 25px;
+  width: 100%;
+  margin: 0;
+}
+
+.header_logo {
+  width: 20px;
+  height: 20px;
+  padding: 5px;
+}
+
+.header_title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.main {
+  flex: 1;
+  padding: 0px;
+  margin: 0px;
+  overflow-y: auto;
+  color: white;
+  background-color: #323232;
+  height: calc(100vh - 80px);
+}
+
+.footer {
+  height: 40px;
+  background-color: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+  position: fixed;
+  bottom: 0;
+}
+
+.contact_edit_dialog {
+  background-color: #323232;
+  color: white;
+  height: 100vh;
+}

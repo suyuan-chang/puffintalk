@@ -25,9 +25,29 @@ router.get('/', authenticateJWT, (req, res) => {
   );
 });
 
+router.get('/:phoneNumber', authenticateJWT, (req, res) => {
+  const userId = req.user.user_id;
+  const phoneNumber = req.params.phoneNumber;
+
+  pool.query(
+    `SELECT c.contact_id, u.phone_number, c.display_name, c.status, c.last_touch_at
+     FROM contacts c
+     JOIN users u ON c.contact_id = u.id
+     WHERE c.user_id = $1 AND u.phone_number = $2
+     ORDER BY c.last_touch_at IS NULL DESC, c.last_touch_at DESC`,
+    [userId, phoneNumber],
+    (error, results) => {
+      if (error) {
+        return res.status(500).json({ error: 'Database query error' });
+      }
+      res.status(200).json({ contacts: results.rows });
+    }
+  );
+});
+
 router.put('/request', authenticateJWT, async (req, res) => {
   const userId = req.user.user_id;
-  const { phone_number } = req.body;
+  const { phone_number, display_name } = req.body;
 
   if (!phone_number) {
     return res.status(400).json({ success: false, message: 'Missing phone number' });
@@ -106,6 +126,13 @@ router.put('/request', authenticateJWT, async (req, res) => {
         [contactId, userId, 'requested', new Date()]
       );
       await pool.query('COMMIT');
+    }
+
+    if (display_name || display_name === '') {
+      await pool.query(
+        'UPDATE contacts SET display_name = $1 WHERE user_id = $2 AND contact_id = $3',
+        [display_name, userId, contactId]
+      );
     }
 
     // Notify the receiver of contact list update.
@@ -261,7 +288,7 @@ router.put('/update', authenticateJWT, async (req, res) => {
   const userId = req.user.user_id;
   const { phone_number, display_name } = req.body;
 
-  if (!phone_number || !display_name) {
+  if (!phone_number || (!display_name && display_name !== '')) {
     return res.status(400).json({ success: false, message: 'Missing phone number or display name' });
   }
 

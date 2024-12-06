@@ -1,0 +1,88 @@
+.messages-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.message-item {
+  margin: 0px;
+  padding: 10px;
+}
+
+.message-item.left {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  margin: 0px;
+  padding: 4px 20px 4px 4px;
+}
+
+.message-item.left.selected {
+  background-color: #435c61;
+}
+
+.message-item.left-mark {
+  padding: 0px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-bottom: 8px solid #00A539;
+}
+
+.message-item.left-text {
+  align-self: flex-start;
+  background-color: #00A539;
+  border-radius: 14px 14px 14px 0px
+}
+
+.message-item.right {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-end;
+  justify-content: flex-start;
+  margin: 0px;
+  padding: 4px 4px 4px 20px;
+}
+
+.message-item.right.selected {
+  background-color: #364550;
+}
+
+.message-item.right-mark {
+  padding: 0px;
+  width: 0;
+  height: 0;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #1A73E8;
+}
+
+.message-item.right-text {
+  align-self: flex-start;
+  background-color: #1A73E8;
+  border-radius: 14px 14px 0px 14px
+}
+
+.message-input {
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+  background-color: #fff;
+}
+
+.message-input input {
+  flex: 1;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 0px;
+  height: 24px;
+  text-align: left;
+}
+
+.message-input button {
+  padding: 4px 8px;
+  background-color: #1A73E8;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

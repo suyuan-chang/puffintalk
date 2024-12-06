@@ -9,6 +9,16 @@ fi
 # Define phone numbers
 PHONE_NUMBER_1="1234567890"
 PHONE_NUMBER_2="9876543210"
+PHONE_NUMBER_3="8888888888"
+
+# Test /api/contacts/request on not registered phone number
+echo "### Test /api/contacts/request"
+RESPONSE=$(curl -s -X PUT http://localhost:3000/api/contacts/request \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TEST_JWT_TOKEN_1234567890" \
+  -d "{\"phone_number\": \"$PHONE_NUMBER_3\"}")
+echo $RESPONSE | jq .
+echo $RESPONSE | jq -e '.success == true' > /dev/null || { echo "Request failed"; exit 1; }
 
 # Test /api/contacts/request
 echo "### Test /api/contacts/request"

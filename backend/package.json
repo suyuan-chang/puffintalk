@@ -16,7 +16,8 @@
     "jsonwebtoken": "^8.5.1",
     "bcrypt": "^5.0.1",
     "multer": "^1.4.4",
-    "ws": "^8.5.0"
+    "ws": "^8.5.0",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.12"

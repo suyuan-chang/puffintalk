@@ -6,6 +6,7 @@ services:
       context: ..
       dockerfile: ./docker/database/Dockerfile
     environment:
+      # Match the value in app service
       POSTGRES_USER: puffintalk_db
       POSTGRES_PASSWORD: puffintalk_db_password
       POSTGRES_DB: puffintalk
@@ -21,11 +22,14 @@ services:
       context: ..
       dockerfile: ./docker/app/Dockerfile
     environment:
+      # Match the value in database service
       DB_HOST: database
       DB_PORT: 5432
       POSTGRES_USER: puffintalk_db
       POSTGRES_PASSWORD: puffintalk_db_password
       POSTGRES_DB: puffintalk
+      # For frontend server domain name for CORS
+      FRONTEND_DOMAIN: http://localhost:4000
       # For development only
       ENABLE_TEST_API: 1
       WILDCARD_PASSCODE: 654321

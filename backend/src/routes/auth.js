@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'puffintalk_jwt_secret';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 
 router.post('/signup', async (req, res) => {
   const { phone_number } = req.body;
@@ -90,7 +91,9 @@ router.post('/complete-signup', async (req, res) => {
       ['registered', phone_number]
     );
 
-    res.status(200).json({ success: true, message: 'Account creation successful' });
+    const token = jwt.sign({ user_id: user.id, phone_number: user.phone_number }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+
+    res.status(200).json({ success: true, token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: 'Server error' });
@@ -168,7 +171,7 @@ router.post('/complete-signin', async (req, res) => {
       return res.status(408).json({ success: false, message: 'Passcode is expired' });
     }
 
-    const token = jwt.sign({ user_id: user.id, phone_number: user.phone_number }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ user_id: user.id, phone_number: user.phone_number }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
     res.status(200).json({ success: true, token });
   } catch (err) {

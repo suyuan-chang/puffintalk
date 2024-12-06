@@ -51,6 +51,21 @@ Sign in a user.
 ```
 
 **Response:**
+On succes, return JWT token used in other APIs.
+```json
+{
+    "success": true,
+    "token": "string"
+}
+```
+
+On error, return error message
+```json
+{
+    "success": false,
+    "message": "string"
+}
+```
 
 - `200 OK`: One-time passcode sent to the phone number.
 - `400 Bad Request`: Invalid phone number.
@@ -69,6 +84,22 @@ Complete the sign-in process using the phone number and one-time passcode.
 ```
 
 **Response:**
+
+On succes, return JWT token used in other APIs.
+```json
+{
+    "success": true,
+    "token": "string"
+}
+```
+
+On error, return error message
+```json
+{
+    "success": false,
+    "message": "string"
+}
+```
 
 - `200 OK`: Sign-in successful.
 - `400 Bad Request`: Invalid phone number or passcode.
@@ -99,6 +130,28 @@ Retrieve the contact list of the authenticated user.
 - `401 Unauthorized`: Authentication required.
 - `500 Internal Server Error`: Server error.
 
+### GET /api/contacts/<phone_number>
+Retrieve the a contact of the authenticated user.
+
+**Response:**
+
+```json
+{
+    "contacts": [
+        {
+            "phone_number": "string",
+            "display_name": "string",
+            "status": "string",
+            "last_touch_at": "string (ISO 8601)"
+        }
+    ]
+}
+```
+
+- `200 OK`: Returns the contact of the phone number.
+- `401 Unauthorized`: Authentication required.
+- `500 Internal Server Error`: Server error.
+
 ### PUT /api/contacts/request
 Send a friend request to another user by phone number.
 If the phone number is not registered, system will use SMS to send invitation link to the user.
@@ -108,7 +161,8 @@ User can send a friend reqeust to a deleted user and resume the friendship, but 
 **Request Body:**
 ```json
 {
-    "phone_number": "string"
+    "phone_number": "string",
+    "display_name": "string"
 }
 ```
 
@@ -231,12 +285,10 @@ Message body is the updated contacts list if 200 OK.
 
 ## Messaging
 
-### GET /api/messages
+### GET /api/messages/<phone_number>
 Retrieve messages between the authenticated user and a contact.
 
 **Query Parameters:**
-- `phone_number`: The phone number of the contact.
-- `id`: Optional. Only return single message object by its id.
 - `count`: Optional. Return up to `count` number latest messages. Maximum number is 255. Default is 100.
 
 **Response:**
@@ -246,6 +298,7 @@ Retrieve messages between the authenticated user and a contact.
         {
             "id": number,
             "sender": "string (phone number)",
+            "receiver": "string (phone number)",
             "message": "string (text message)",
             "message_type": "string (text, audio, video)",
             "media_type": "string (media format MIME)",
@@ -288,6 +341,7 @@ Response body return the new created message object if status is 200 OK.
         {
             "id": number,
             "sender": "string (phone number)",
+            "receiver": "string (phone number)",
             "message": "string (text message)",
             "message_type": "string (text, audio, video)",
             "media_type": "string (media format MIME)",

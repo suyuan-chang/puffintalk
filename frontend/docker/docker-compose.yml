@@ -12,3 +12,4 @@ services:
       - ../public:/usr/src/app/public
     environment:
       - NODE_ENV=development
+      - PUFFINTALK_API_URL=http://localhost:3000/api
