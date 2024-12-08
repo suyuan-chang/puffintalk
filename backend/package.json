@@ -17,7 +17,9 @@
     "bcrypt": "^5.0.1",
     "multer": "^1.4.4",
     "ws": "^8.5.0",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "fluent-ffmpeg": "^2.1.2",
+    "streamifier": "^0.1.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.12"

@@ -1,6 +1,6 @@
 
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'puffintalk_jwt_secret';
+const { JWT_SECRET } = require('../utils/jwt');
 
 const authenticateJWT = (req, res, next) => {
   const token = req.header('Authorization')?.split(' ')[1];

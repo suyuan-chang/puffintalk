@@ -35,6 +35,23 @@ const ContactsList = ({ contacts, disableKeyboardControl, onHighlightItem, onSel
     }
   }, [selectedIndex, onHighlightItem]);
 
+  const displayContactStatus = (status) => {
+    switch (status) {
+      case 'requesting':
+        return 'Waiting for acceptance';
+      case 'requested':
+        return 'Friend request received';
+      case 'accepted':
+        return 'Friend';
+      case 'blocked':
+        return 'Blocked';
+      case 'deleted':
+        return 'Deleted';
+      default:
+        return status;
+    }
+  };
+
   return (
     <div className='contact_list'>
       <ul>
@@ -56,7 +73,9 @@ const ContactsList = ({ contacts, disableKeyboardControl, onHighlightItem, onSel
                 {contact.display_name || contact.phone_number}
               </div>
               <div className={`contact_status status_${contact.status}`}>
-                {contact.status !== 'accepted' ? contact.status : ''}
+                {contact.status !== 'accepted' ? displayContactStatus(contact.status) :
+                  (contact.unread_messages > 0 ?
+                    `${contact.unread_messages} new messages` : '')}
               </div>
             </li>
           ))}

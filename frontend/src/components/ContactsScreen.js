@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { API_URL } from '../utils/api';
 import { useHistory } from 'react-router-dom';
 import ContactsList from './ContactsList';
@@ -7,8 +7,10 @@ import EditContact from './EditContact';
 import PopupMenu from './PopupMenu';
 import PopupMessage from './PopupMessage';
 
-import logo from '../assets/logo-small.png';
+import logoLeft from '../assets/PuffinTalk-a.png';
+import logoRight from '../assets/PuffinTalk-b.png';
 import '../styles/Screen.css';
+import '../styles/ContactsScreen.css';
 
 const ContactsScreen = () => {
   const [contacts, setContacts] = useState([]);
@@ -23,6 +25,7 @@ const ContactsScreen = () => {
   const [showAddContact, setShowAddContact] = useState(false);
   const [showEditContact, setShowEditContact] = useState(null);
   const history = useHistory();
+  const ws = useRef(null);
 
   const fetchContacts = async () => {
     const token = localStorage.getItem('auth_token');
@@ -44,11 +47,76 @@ const ContactsScreen = () => {
 
     const data = await response.json();
     setContacts(data.contacts);
+
+    if (data.contacts.length === 0) {
+      setHighlightContact(null);
+    }
   };
 
   useEffect(() => {
     fetchContacts();
   }, [history]);
+
+  useEffect(() => {
+    // Initialize WebSocket connection
+    const token = localStorage.getItem('auth_token');
+    ws.current = new WebSocket(`${API_URL}/notifications?token=${token}`);
+
+    ws.current.onopen = () => {
+      console.log('WebSocket connection opened');
+    };
+
+    ws.current.onmessage = (event) => {
+      console.log('WebSocket message:', event.data);
+      const message = JSON.parse(event.data);
+      if (message.event === 'contacts_updated' || message.event === 'messages_updated') {
+        fetchContacts();
+      }
+    };
+
+    ws.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    ws.current.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    // Cleanup WebSocket connection on component unmount
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const canEdit = !!highlightContact;
+    const canAccept = highlightContact && highlightContact.status === 'requested';
+    const canDelete = highlightContact && highlightContact.status !== 'deleted';
+    const canMessage = highlightContact && highlightContact.status === 'accepted';
+
+    setCanEditContact(canEdit);
+    setCanAcceptContact(canAccept);
+    setCanDeleteContact(canDelete);
+    setCanMessageContact(canMessage);
+
+    const menuItems = ['Add contact'];
+    if (canEdit) {
+      menuItems.push('Edit contact');
+    }
+    if (canAccept) {
+      menuItems.push('Accept contact');
+    }
+    if (canDelete) {
+      menuItems.push('Delete contact');
+    }
+    if (canMessage) {
+      menuItems.push('Message contact');
+    }
+    menuItems.push('Sign out');
+    setContextMenuItems(menuItems);
+  }, [highlightContact]);
 
   // NOTE: Use back button to close popup menu.
   useEffect(() => {
@@ -153,34 +221,7 @@ const ContactsScreen = () => {
       return;
     }
     console.log('Highlight contact', contact);
-
     setHighlightContact(contact);
-
-    const canEdit = !!contact;
-    const canAccept = contact && contact.status === 'requested';
-    const canDelete = contact && contact.status !== 'deleted';
-    const canMessage = contact && contact.status === 'accepted';
-
-    setCanEditContact(canEdit);
-    setCanAcceptContact(canAccept);
-    setCanDeleteContact(canDelete);
-    setCanMessageContact(canMessage);
-
-    const menuItems = ['Add contact'];
-    if (canEdit) {
-      menuItems.push('Edit contact');
-    }
-    if (canAccept) {
-      menuItems.push('Accept contact');
-    }
-    if (canDelete) {
-      menuItems.push('Delete contact');
-    }
-    if (canMessage) {
-      menuItems.push('Message contact');
-    }
-    menuItems.push('Sign out');
-    setContextMenuItems(menuItems);
   };
 
   const handlePopupMenu = (item) => {
@@ -341,14 +382,21 @@ const ContactsScreen = () => {
   return (
     <div className="full_container">
       <div className="header">
-        <img src={logo} alt="Logo" className="header_logo" />
+        <img src={logoLeft} alt="Logo" className="header_logo" />
         <h2 className="header_title">PuffinTalk</h2>
+        <img src={logoRight} alt="Logo" className="header_logo" />
       </div>
       <div className="main">
-        <ContactsList contacts={contacts}
-          disableKeyboardControl={showMenu || showMessage}
-          onHighlightItem={handleHighlightContact}
-          onSelectItem={handleMessageContact}/>
+        {contacts.length === 0 ? (
+          <div className="center_container">
+            <button onClick={handleAddContact}>Add first contact</button>
+          </div>
+        ) : (
+          <ContactsList contacts={contacts}
+            disableKeyboardControl={showMenu || showMessage}
+            onHighlightItem={handleHighlightContact}
+            onSelectItem={handleMessageContact}/>
+        )}
       </div>
       <div className="footer">
         <button className="menu" onClick={handleMenu}>Menu</button>

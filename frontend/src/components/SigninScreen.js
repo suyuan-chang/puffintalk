@@ -3,7 +3,7 @@ import { API_URL } from '../utils/api';
 import { useHistory } from 'react-router-dom';
 import PopupMessage from '../components/PopupMessage';
 
-import logo from '../assets/logo.png';
+import logo from '../assets/PuffinTalk.png';
 import '../styles/Screen.css'; // Import the shared CSS file
 
 const SigninScreen = ({ method }) => {
@@ -75,16 +75,20 @@ const SigninScreen = ({ method }) => {
     <div className="container">
       {errorMessage && <PopupMessage message={errorMessage} />}
       <img src={logo} alt="PuffinTalk Logo" className="logo" />
-      <h1>Enter Passcode</h1>
+      <div>
+        Please input passcode sent to your phone number
+      </div>
       <input
         type="text"
         placeholder="Enter your passcode"
         value={passcode}
         onChange={handleInputChange}
       />
-      <button onClick={handleSignIn} className={`${method}`} >
-        {method === 'signin' ? 'Sign In' : 'Sign Up'}
-      </button>
+      <div>
+        <button onClick={handleSignIn} className={`${method}`} >
+          {method === 'signin' ? 'Sign In' : 'Sign Up'}
+        </button>
+      </div>
     </div>
   );
 };

@@ -152,7 +152,7 @@ Retrieve the a contact of the authenticated user.
 - `401 Unauthorized`: Authentication required.
 - `500 Internal Server Error`: Server error.
 
-### PUT /api/contacts/request
+### POST /api/contacts/request
 Send a friend request to another user by phone number.
 If the phone number is not registered, system will use SMS to send invitation link to the user.
 
@@ -358,11 +358,55 @@ Response body return the new created message object if status is 200 OK.
 - `404 Not Found`: Recipient not found.
 - `500 Internal Server Error`: Server error.
 
+### PUT /api/messages/read
+Set the status of a message to `seen`.
+
+**Request Body:**
+```json
+{
+  "message_id": number
+}
+```
+
+**Response:**
+```json
+{
+  "success": true
+}
+```
+
+- `200 OK`: Message status updated to `seen`.
+- `400 Bad Request`: Invalid message ID.
+- `404 Not Found`: Message not found.
+- `500 Internal Server Error`: Server error.
+
+### PUT /api/messages/read_all_text
+Set the status of all text messages sent by a specific phone number to `seen`.
+
+**Request Body:**
+```json
+{
+  "phone_number": "string"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true
+}
+```
+
+- `200 OK`: All text messages marked as `seen`.
+- `400 Bad Request`: Invalid phone number.
+- `404 Not Found`: No messages found for the given phone number.
+- `500 Internal Server Error`: Server error.
+
 ### POST /api/messages/upload_media
 Upload a video or audio clip to the backend media content storage.
 
 **Query Parameters:**
-- `media_type`: The type of media being uploaded (audio, video).
+- `media_type`: The MIME type of media being uploaded (must be audio/* or video/*).
 
 **Request:**
 
@@ -382,11 +426,11 @@ Content-Type: `multipart/form-data`
 - `400 Bad Request`: Invalid media type or data.
 - `500 Internal Server Error`: Server error.
 
-### GET /api/messages/media
+### GET /api/messages/media/<media_content_id>
 Download previously uploaded media by the `media_content_id`.
 
 **Query Parameters:**
-- `media_content_id`: The ID of the media content to be downloaded.
+- `token`: JWT auth token of signin user. Only media content uploader and the sender and receiver of the associated message can download this media.
 
 **Response:**
 

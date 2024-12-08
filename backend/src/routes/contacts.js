@@ -6,46 +6,50 @@ const bcrypt = require('bcrypt');
 const authenticateJWT = require('../middleware/auth');
 const { notifyClients } = require('../websocket');
 
-router.get('/', authenticateJWT, (req, res) => {
-  const userId = req.user.user_id;
+const getContacts = async (userId, phoneNumber) => {
+  // Return updated contacts list.
+  const updatedContacts = phoneNumber ?
+    await pool.query(
+      `SELECT c.contact_id, u.phone_number, c.display_name, c.status, c.last_touch_at, c.unread_messages
+        FROM contacts c
+        JOIN users u ON c.contact_id = u.id
+        WHERE c.user_id = $1 AND u.phone_number = $2
+        ORDER BY c.last_touch_at DESC`,
+        [userId, phoneNumber]) :
+    await pool.query(
+        `SELECT c.contact_id, u.phone_number, c.display_name, c.status, c.last_touch_at, c.unread_messages
+          FROM contacts c
+          JOIN users u ON c.contact_id = u.id
+          WHERE c.user_id = $1
+          ORDER BY c.last_touch_at DESC`,
+          [userId]);
+  return updatedContacts.rows;
+};
 
-  pool.query(
-    `SELECT c.contact_id, u.phone_number, c.display_name, c.status, c.last_touch_at
-     FROM contacts c
-     JOIN users u ON c.contact_id = u.id
-     WHERE c.user_id = $1
-     ORDER BY c.last_touch_at IS NULL DESC, c.last_touch_at DESC`,
-    [userId],
-    (error, results) => {
-      if (error) {
-        return res.status(500).json({ error: 'Database query error' });
-      }
-      res.status(200).json({ contacts: results.rows });
-    }
-  );
+router.get('/', authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const contacts = await getContacts(userId);
+    res.status(200).json({ success: true, contacts: contacts });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
 });
 
-router.get('/:phoneNumber', authenticateJWT, (req, res) => {
-  const userId = req.user.user_id;
-  const phoneNumber = req.params.phoneNumber;
-
-  pool.query(
-    `SELECT c.contact_id, u.phone_number, c.display_name, c.status, c.last_touch_at
-     FROM contacts c
-     JOIN users u ON c.contact_id = u.id
-     WHERE c.user_id = $1 AND u.phone_number = $2
-     ORDER BY c.last_touch_at IS NULL DESC, c.last_touch_at DESC`,
-    [userId, phoneNumber],
-    (error, results) => {
-      if (error) {
-        return res.status(500).json({ error: 'Database query error' });
-      }
-      res.status(200).json({ contacts: results.rows });
-    }
-  );
+router.get('/:phoneNumber', authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const phoneNumber = req.params.phoneNumber;
+    const contacts = await getContacts(userId, phoneNumber);
+    res.status(200).json({ success: true, contacts: contacts });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
 });
 
-router.put('/request', authenticateJWT, async (req, res) => {
+router.post('/request', authenticateJWT, async (req, res) => {
   const userId = req.user.user_id;
   const { phone_number, display_name } = req.body;
 
@@ -118,12 +122,12 @@ router.put('/request', authenticateJWT, async (req, res) => {
       // If contact doesn't exist, create a new friend request.
       await pool.query('BEGIN');
       await pool.query(
-        'INSERT INTO contacts (user_id, contact_id, status, created_at) VALUES ($1, $2, $3, $4)',
-        [userId, contactId, 'requesting', new Date()]
+        'INSERT INTO contacts (user_id, contact_id, status, created_at, last_touch_at) VALUES ($1, $2, $3, $4, $5)',
+        [userId, contactId, 'requesting', new Date(), new Date()]
       );
       await pool.query(
-        'INSERT INTO contacts (user_id, contact_id, status, created_at) VALUES ($1, $2, $3, $4)',
-        [contactId, userId, 'requested', new Date()]
+        'INSERT INTO contacts (user_id, contact_id, status, created_at, last_touch_at) VALUES ($1, $2, $3, $4, $5)',
+        [contactId, userId, 'requested', new Date(), new Date()]
       );
       await pool.query('COMMIT');
     }
@@ -142,15 +146,8 @@ router.put('/request', authenticateJWT, async (req, res) => {
     }, contactId);
 
     // Return updated contacts list.
-    const updatedContacts = await pool.query(
-      `SELECT c.contact_id, u.phone_number, c.display_name, c.status, c.last_touch_at
-       FROM contacts c
-       JOIN users u ON c.contact_id = u.id
-       WHERE c.user_id = $1
-       ORDER BY c.last_touch_at IS NULL DESC, c.last_touch_at DESC`,
-       [userId]);
-
-    res.status(200).json({ success: true, contacts: updatedContacts.rows });
+    const updatedContacts = await getContacts(userId);
+    res.status(200).json({ success: true, contacts: updatedContacts });
   } catch (err) {
     await pool.query('ROLLBACK');
     console.error(err);
@@ -200,15 +197,8 @@ router.put('/accept', authenticateJWT, async (req, res) => {
     }, contactId);
 
     // Return updated contacts list.
-    const updatedContacts = await pool.query(
-      `SELECT c.contact_id, u.phone_number, c.display_name, c.status, c.last_touch_at
-       FROM contacts c
-       JOIN users u ON c.contact_id = u.id
-       WHERE c.user_id = $1
-       ORDER BY c.last_touch_at IS NULL DESC, c.last_touch_at DESC`,
-       [userId]);
-
-    res.status(200).json({ success: true, contacts: updatedContacts.rows });
+    const updatedContacts = await getContacts(userId);
+    res.status(200).json({ success: true, contacts: updatedContacts });
   } catch (err) {
     await pool.query('ROLLBACK');
     console.error(err);
@@ -268,15 +258,8 @@ router.put('/delete', authenticateJWT, async (req, res) => {
     }, contactId);
 
     // Return updated contacts list.
-    const updatedContacts = await pool.query(
-      `SELECT c.contact_id, u.phone_number, c.display_name, c.status, c.last_touch_at
-       FROM contacts c
-       JOIN users u ON c.contact_id = u.id
-       WHERE c.user_id = $1
-       ORDER BY c.last_touch_at IS NULL DESC, c.last_touch_at DESC`,
-       [userId]);
-
-    res.status(200).json({ success: true, contacts: updatedContacts.rows });
+    const updatedContacts = await getContacts(userId);
+    res.status(200).json({ success: true, contacts: updatedContacts });
   } catch (err) {
     await pool.query('ROLLBACK');
     console.error(err);
@@ -314,15 +297,8 @@ router.put('/update', authenticateJWT, async (req, res) => {
     );
 
     // Return updated contacts list.
-    const updatedContacts = await pool.query(
-      `SELECT c.contact_id, u.phone_number, c.display_name, c.status, c.last_touch_at
-       FROM contacts c
-       JOIN users u ON c.contact_id = u.id
-       WHERE c.user_id = $1
-       ORDER BY c.last_touch_at IS NULL DESC, c.last_touch_at DESC`,
-       [userId]);
-
-    res.status(200).json({ success: true, contacts: updatedContacts.rows });
+    const updatedContacts = await getContacts(userId);
+    res.status(200).json({ success: true, contacts: updatedContacts });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: 'Server error' });

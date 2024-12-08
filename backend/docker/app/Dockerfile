@@ -4,6 +4,9 @@ FROM node:20
 # Install nodemon globally
 RUN npm install -g nodemon
 
+# Install ffmpeg. This is required for check upload media file.
+RUN apt-get update && apt-get install -y ffmpeg
+
 # Create a directory for application source code
 RUN mkdir -p /usr/src/app/src
 

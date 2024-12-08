@@ -13,7 +13,7 @@ PHONE_NUMBER_3="8888888888"
 
 # Test /api/contacts/request on not registered phone number
 echo "### Test /api/contacts/request"
-RESPONSE=$(curl -s -X PUT http://localhost:3000/api/contacts/request \
+RESPONSE=$(curl -s -X POST http://localhost:3000/api/contacts/request \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TEST_JWT_TOKEN_1234567890" \
   -d "{\"phone_number\": \"$PHONE_NUMBER_3\"}")
@@ -22,7 +22,7 @@ echo $RESPONSE | jq -e '.success == true' > /dev/null || { echo "Request failed"
 
 # Test /api/contacts/request
 echo "### Test /api/contacts/request"
-RESPONSE=$(curl -s -X PUT http://localhost:3000/api/contacts/request \
+RESPONSE=$(curl -s -X POST http://localhost:3000/api/contacts/request \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TEST_JWT_TOKEN_1234567890" \
   -d "{\"phone_number\": \"$PHONE_NUMBER_2\"}")
@@ -74,7 +74,7 @@ echo $RESPONSE | jq -e ".contacts | map(select(.phone_number == \"$PHONE_NUMBER_
 
 # Test /api/contacts/request again to check if contact status goes back to accepted
 echo "### Test /api/contacts/request again"
-RESPONSE=$(curl -s -X PUT http://localhost:3000/api/contacts/request \
+RESPONSE=$(curl -s -X POST http://localhost:3000/api/contacts/request \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TEST_JWT_TOKEN_1234567890" \
   -d "{\"phone_number\": \"$PHONE_NUMBER_2\"}")

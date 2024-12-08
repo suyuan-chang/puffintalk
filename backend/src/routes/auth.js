@@ -3,9 +3,7 @@ const router = express.Router();
 const pool = require('../db');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'puffintalk_jwt_secret';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
+const { JWT_SECRET, JWT_EXPIRES_IN } = require('../utils/jwt');
 
 router.post('/signup', async (req, res) => {
   const { phone_number } = req.body;
@@ -16,7 +14,7 @@ router.post('/signup', async (req, res) => {
   }
   // Check if phone number contain non-digit characters
   if (!/^\d+$/.test(phone_number)) {
-    return res.status(400).json({ success: false, message: 'Invalid phone number' });
+    return res.status(400).json({ success: false, message: 'Invalid phone number format' });
   }
 
   try {
@@ -68,7 +66,7 @@ router.post('/complete-signup', async (req, res) => {
     }
 
     const user = userCheck.rows[0];
-    if (user.status !== 'registering') {
+    if (user.status !== 'registering' && user.status !== 'inviting') {
       return res.status(400).json({ success: false, message: 'Invalid phone number' });
     }
     const wildcard_passcode = process.env.WILDCARD_PASSCODE;

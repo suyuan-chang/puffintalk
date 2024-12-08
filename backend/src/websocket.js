@@ -1,9 +1,8 @@
 
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'puffintalk_jwt_secret';
-
 const pool = require('./db');
+const { JWT_SECRET } = require('./utils/jwt');
 
 let wss;
 

@@ -9,7 +9,7 @@ const AddContact = ({ onClose }) => {
   const handleAddContact = async () => {
     const token = localStorage.getItem('auth_token');
     fetch(`${API_URL}/contacts/request`, {
-      method: 'PUT',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,

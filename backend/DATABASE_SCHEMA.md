@@ -38,6 +38,7 @@ Stores user contacts.
 | status        | VARCHAR(16)  | Status of the contact              |
 | created_at    | TIMESTAMP    | Contact creation timestamp         |
 | last_touch_at | TIMESTAMP    | Last interaction timestamp         |
+| unread_messages | INTEGER    | Number of unread messages from contact_id to user_id |
 
 Contacts status definition:
 - `requesting`: Friend request sent.
@@ -76,6 +77,7 @@ Stores multimedia messages.
 | message_id    | INTEGER      | Foreign key to Messages table (nullable) |
 | media_type    | VARCHAR(16)  | Media format (MIME)                |
 | media_data    | BYTEA        | Binary data for the media content  |
+| duration      | FLOAT        | Duration of the media content in seconds |
 | created_at    | TIMESTAMP    | Media content creation timestamp   |
 
 ## Relationships

@@ -7,6 +7,7 @@ body {
 .container {
   text-align: center;
   padding: 13px 18px;
+  color: white;
 }
 
 input {
@@ -80,7 +81,7 @@ h1 {
 }
 
 .logo {
-  width: 30%;
+  width: 120px;
 }
 
 .full_container {
@@ -92,11 +93,11 @@ h1 {
 
 .header {
   height: 40px;
-  background-color: black;
+  background-color: #1F41B6;
   color: white;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   padding: 0px;
   margin: 0px;
   font-family: 'Roboto Black', sans-serif;
@@ -107,9 +108,9 @@ h1 {
 }
 
 .header_logo {
-  width: 20px;
   height: 20px;
-  padding: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .header_title {
@@ -127,7 +128,7 @@ h1 {
   margin: 0px;
   overflow-y: auto;
   color: white;
-  background-color: #323232;
+  background-color: black;
   height: calc(100vh - 80px);
 }
 
@@ -145,7 +146,7 @@ h1 {
 }
 
 .contact_edit_dialog {
-  background-color: #323232;
+  background-color: black;
   color: white;
   height: 100vh;
 }

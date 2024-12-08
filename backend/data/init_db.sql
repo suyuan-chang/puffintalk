@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS contacts (
     display_name VARCHAR(50),
     status VARCHAR(16) CHECK (status IN ('requesting', 'requested', 'accepted', 'blocked', 'deleted')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_touch_at TIMESTAMP
+    last_touch_at TIMESTAMP,
+    unread_messages INT DEFAULT 0
 );
 
 -- Create messages table
@@ -48,6 +49,7 @@ CREATE TABLE IF NOT EXISTS media_content (
     message_id INT REFERENCES messages(id) ON DELETE CASCADE,
     media_type VARCHAR(16),
     media_data BYTEA,
+    duration FLOAT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

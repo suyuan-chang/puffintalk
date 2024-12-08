@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { API_URL } from '../utils/api';
 import PopupMessage from '../components/PopupMessage';
 
-import logo from '../assets/logo.png';
+import logo from '../assets/PuffinTalk.png';
 import '../styles/Screen.css'; // Import the shared CSS file
 
 const HomeScreen = () => {
@@ -103,15 +103,17 @@ const HomeScreen = () => {
     <div className="container">
       {errorMessage && <PopupMessage message={errorMessage} />}
       <img src={logo} alt="PuffinTalk Logo" className="logo" />
-      <h1>Welcome to PuffinTalk</h1>
+      <h1>PuffinTalk</h1>
       <input
         type="text"
         placeholder="Phone number"
         value={phoneNumber}
         onChange={handleInputChange}
       />
-      <button className="signin" onClick={handleSignIn}>Sign In</button>
-      <button className="signup" onClick={handleSignUp}>Sign Up</button>
+      <div>
+        <button className="signin" onClick={handleSignIn}>Sign In</button>
+        <button className="signup" onClick={handleSignUp}>Sign Up</button>
+      </div>
     </div>
   );
 };
