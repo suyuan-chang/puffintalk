@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../utils/jwt');
+const { sendSMS } = require('../utils/sms');
 
 router.post('/signup', async (req, res) => {
   const { phone_number } = req.body;
@@ -43,6 +43,14 @@ router.post('/signup', async (req, res) => {
     // Here you would send the passcode via SMS to the user's phone number
     // For now, we'll just log it to the console
     console.log(`Passcode for ${phone_number}: ${passcode}`);
+    try {
+      const ret = await sendSMS(phone_number, `Your PuffinTalk passcode is: ${passcode}`);
+      if (!ret.success) {
+        return res.status(500).json({ success: false, message: 'Cannot send SMS to phone number' });
+      }
+    } catch (err) {
+      return res.status(500).json({ success: false, message: 'Cannot send SMS to phone number' });
+    }
 
     res.status(200).json({ success: true, message: 'One-time passcode sent to the phone number' });
   } catch (err) {
@@ -128,6 +136,14 @@ router.post('/signin', async (req, res) => {
     // Here you would send the passcode via SMS to the user's phone number
     // For now, we'll just log it to the console
     console.log(`Passcode for ${phone_number}: ${passcode}`);
+    try {
+      const ret = await sendSMS(phone_number, `Your PuffinTalk passcode is: ${passcode}`);
+      if (!ret.success) {
+        return res.status(500).json({ success: false, message: 'Cannot send SMS to phone number' });
+      }
+    } catch (err) {
+      return res.status(500).json({ success: false, message: 'Cannot send SMS to phone number' });
+    }
 
     res.status(200).json({ success: true, message: 'One-time passcode sent to the phone number' });
   } catch (err) {

@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const authenticateJWT = require('../middleware/auth');
 
 router.get('/', (req, res) => {

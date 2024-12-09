@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const authenticateJWT = require('../middleware/auth');
 const { notifyClients } = require('../websocket');
+const { sendSMS } = require('../utils/sms');
 
 const getContacts = async (userId, phoneNumber) => {
   // Return updated contacts list.
@@ -51,6 +50,7 @@ router.get('/:phoneNumber', authenticateJWT, async (req, res) => {
 
 router.post('/request', authenticateJWT, async (req, res) => {
   const userId = req.user.user_id;
+  const userPhoneNumber = req.user.phone_number;
   const { phone_number, display_name } = req.body;
 
   if (!phone_number) {
@@ -63,15 +63,27 @@ router.post('/request', authenticateJWT, async (req, res) => {
     if (userCheck.rows.length > 0) {
       contactId = userCheck.rows[0].id;
     } else {
+      // Phone number not found, send SMS to invite the user to join PuffinTalk.
+      console.log(`Sent inviting SMS to ${phone_number}`);
+      try {
+        const url = process.env.FRONTEND_DOMAIN || 'https://puffintalk.cloudmosa.com';
+        const ret = await sendSMS(phone_number,
+          `You are invited to join PuffinTalk by phone number +${userPhoneNumber}.
+           Send and receive international message/voice/video free with your friends.
+           Visit ${url}`);
+        if (!ret.success) {
+          return res.status(500).json({ success: false, message: 'Cannot send inviting SMS to phone number' });
+        }
+      } catch (err) {
+        return res.status(500).json({ success: false, message: 'Cannot send inviting SMS to phone number' });
+      }
+
       // Phone number not found, add a placeholder user into users table.
       const newUser = await pool.query(
         'INSERT INTO users (phone_number, status) VALUES ($1, $2) RETURNING id',
         [phone_number, 'inviting']
       );
       contactId = newUser.rows[0].id;
-
-      // TODO: Send SMS to phone_number with a link to the app.
-      console.log(`Sent inviting SMS to ${phone_number}`);
     }
 
     const contactCheck = await pool.query(

@@ -16,6 +16,9 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json
 COPY ./package*.json ./
 
+# Install twilio for sending SMS
+RUN npm install twilio
+
 # Install app dependencies
 RUN npm install
 
